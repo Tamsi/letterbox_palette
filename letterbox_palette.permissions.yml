@@ -1,0 +1,4 @@
+administer letterbox palette:
+  title: 'Administer Letterbox Palette'
+  description: 'Configure which bundles and fields use the letterbox palette UI.'
+  restrict access: true

@@ -1,0 +1,10 @@
+services:
+  letterbox_palette.extractor:
+    class: Drupal\letterbox_palette\Service\DominantColorExtractor
+    arguments:
+      - '@file_system'
+      - '@logger.factory'
+
+  logger.channel.letterbox_palette:
+    parent: logger.channel_base
+    arguments: ['letterbox_palette']

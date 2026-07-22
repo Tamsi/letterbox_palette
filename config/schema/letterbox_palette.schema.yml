@@ -1,0 +1,34 @@
+letterbox_palette.settings:
+  type: config_object
+  label: 'Letterbox Palette settings'
+  mapping:
+    preview_image_style:
+      type: string
+      label: 'Preview image style'
+    preview_aspect_ratio:
+      type: string
+      label: 'Preview CSS aspect-ratio'
+    mappings:
+      type: sequence
+      label: 'Field mappings'
+      sequence:
+        type: mapping
+        mapping:
+          entity_type:
+            type: string
+            label: 'Entity type'
+          bundle:
+            type: string
+            label: 'Bundle'
+          image_field:
+            type: string
+            label: 'Source image field'
+          color_field:
+            type: string
+            label: 'Background color field'
+          gradient_field:
+            type: string
+            label: 'Gradient checkbox field'
+          form_group:
+            type: string
+            label: 'Optional field_group machine name'

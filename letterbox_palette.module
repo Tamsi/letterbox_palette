@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Hooks for the Letterbox Palette module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\letterbox_palette\PaletteFormAlter;
+
+/**
+ * Implements hook_form_alter().
+ */
+function letterbox_palette_form_alter(array &$form, FormStateInterface $form_state, $form_id): void {
+  \Drupal::classResolver(PaletteFormAlter::class)
+    ->alterForm($form, $form_state, (string) $form_id);
+}

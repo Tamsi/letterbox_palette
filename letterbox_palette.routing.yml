@@ -1,0 +1,7 @@
+letterbox_palette.settings:
+  path: '/admin/config/content/letterbox-palette'
+  defaults:
+    _form: '\Drupal\letterbox_palette\Form\SettingsForm'
+    _title: 'Letterbox Palette'
+  requirements:
+    _permission: 'administer letterbox palette'

@@ -1,0 +1,6 @@
+letterbox_palette.settings:
+  title: 'Letterbox Palette'
+  description: 'Map image fields to letterbox background color fields and configure the editor preview.'
+  parent: system.admin_config_content
+  route_name: letterbox_palette.settings
+  weight: 50

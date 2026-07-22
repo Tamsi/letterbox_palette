@@ -1,0 +1,9 @@
+palette_form:
+  css:
+    theme:
+      css/palette-form.css: {}
+  js:
+    js/palette-form.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
