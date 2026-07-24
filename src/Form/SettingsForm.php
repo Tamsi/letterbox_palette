@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\letterbox_palette\Form;
 
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -16,22 +16,22 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SettingsForm extends ConfigFormBase {
 
   /**
-   * The entity type manager.
-   */
-  protected EntityTypeManagerInterface $entityTypeManager;
-
-  /**
    * The bundle info service.
    */
   protected EntityTypeBundleInfoInterface $bundleInfo;
+
+  /**
+   * The entity field manager.
+   */
+  protected EntityFieldManagerInterface $entityFieldManager;
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container): static {
     $instance = parent::create($container);
-    $instance->entityTypeManager = $container->get('entity_type.manager');
     $instance->bundleInfo = $container->get('entity_type.bundle.info');
+    $instance->entityFieldManager = $container->get('entity_field.manager');
     return $instance;
   }
 
@@ -98,6 +98,7 @@ class SettingsForm extends ConfigFormBase {
       '#type' => 'actions',
       'add' => [
         '#type' => 'submit',
+        '#name' => 'add_mapping',
         '#value' => $this->t('Add mapping'),
         '#submit' => ['::addMapping'],
         '#ajax' => [
@@ -196,7 +197,7 @@ class SettingsForm extends ConfigFormBase {
    * Adds an empty mapping row.
    */
   public function addMapping(array &$form, FormStateInterface $form_state): void {
-    $mappings = $form_state->get('mappings') ?? [];
+    $mappings = $this->extractMappingsFromFormState($form_state);
     $mappings[] = [
       'entity_type' => 'node',
       'bundle' => '',
@@ -217,7 +218,7 @@ class SettingsForm extends ConfigFormBase {
     $delta = isset($trigger['#attributes']['data-delta'])
       ? (int) $trigger['#attributes']['data-delta']
       : NULL;
-    $mappings = $form_state->get('mappings') ?? [];
+    $mappings = $this->extractMappingsFromFormState($form_state);
     if ($delta !== NULL && isset($mappings[$delta])) {
       unset($mappings[$delta]);
       $form_state->set('mappings', array_values($mappings));
@@ -228,28 +229,71 @@ class SettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state): void {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
+    parent::validateForm($form, $form_state);
+
+    // Skip mapping checks for AJAX add/remove actions.
+    $trigger = $form_state->getTriggeringElement();
+    $trigger_name = is_array($trigger) ? (string) ($trigger['#name'] ?? '') : '';
+    if ($trigger_name === 'add_mapping' || str_starts_with($trigger_name, 'remove_mapping_')) {
+      return;
+    }
+
+    $aspect = trim((string) $form_state->getValue('preview_aspect_ratio'));
+    if ($aspect === '' || !preg_match('/^\d+(\.\d+)?\s*\/\s*\d+(\.\d+)?$/', $aspect)) {
+      $form_state->setErrorByName('preview_aspect_ratio', $this->t('Enter a CSS aspect-ratio value such as <code>16 / 9</code>.'));
+    }
+
     $raw = $form_state->getValue('mappings') ?? [];
-    $mappings = [];
     foreach ($raw as $key => $row) {
       if (!is_numeric($key) || !is_array($row)) {
         continue;
       }
+      $bundle = trim((string) ($row['bundle'] ?? ''));
       $image = trim((string) ($row['image_field'] ?? ''));
       $color = trim((string) ($row['color_field'] ?? ''));
-      $bundle = trim((string) ($row['bundle'] ?? ''));
-      if ($image === '' || $color === '' || $bundle === '') {
+      $gradient = trim((string) ($row['gradient_field'] ?? ''));
+      if ($bundle === '' || $image === '' || $color === '') {
         continue;
       }
-      $mappings[] = [
-        'entity_type' => 'node',
-        'bundle' => $bundle,
-        'image_field' => $image,
-        'color_field' => $color,
-        'gradient_field' => trim((string) ($row['gradient_field'] ?? '')),
-        'form_group' => trim((string) ($row['form_group'] ?? '')),
-      ];
+
+      $definitions = $this->entityFieldManager->getFieldDefinitions('node', $bundle);
+      if (!isset($definitions[$image]) || $definitions[$image]->getType() !== 'image') {
+        $form_state->setErrorByName("mappings][$key][image_field", $this->t('Field %field is not an image field on content type %bundle.', [
+          '%field' => $image,
+          '%bundle' => $bundle,
+        ]));
+      }
+      if (!isset($definitions[$color]) || !in_array($definitions[$color]->getType(), ['string', 'string_long'], TRUE)) {
+        $form_state->setErrorByName("mappings][$key][color_field", $this->t('Field %field must be a plain text field on content type %bundle.', [
+          '%field' => $color,
+          '%bundle' => $bundle,
+        ]));
+      }
+      elseif (($definitions[$color]->getSetting('max_length') ?? 255) < 7) {
+        $form_state->setErrorByName("mappings][$key][color_field", $this->t('Color field %field needs a max length of at least 7.', [
+          '%field' => $color,
+        ]));
+      }
+      if ($gradient !== '') {
+        if (!isset($definitions[$gradient]) || $definitions[$gradient]->getType() !== 'boolean') {
+          $form_state->setErrorByName("mappings][$key][gradient_field", $this->t('Field %field must be a boolean field on content type %bundle.', [
+            '%field' => $gradient,
+            '%bundle' => $bundle,
+          ]));
+        }
+      }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
+    $mappings = array_values(array_filter(
+      $this->extractMappingsFromFormState($form_state),
+      static fn(array $row): bool => $row['bundle'] !== '' && $row['image_field'] !== '' && $row['color_field'] !== ''
+    ));
 
     $this->config('letterbox_palette.settings')
       ->set('preview_image_style', (string) $form_state->getValue('preview_image_style'))
@@ -258,6 +302,31 @@ class SettingsForm extends ConfigFormBase {
       ->save();
 
     parent::submitForm($form, $form_state);
+  }
+
+  /**
+   * Builds normalized mapping rows from the current form values.
+   *
+   * @return array<int, array<string, string>>
+   *   Mapping rows keyed by delta.
+   */
+  protected function extractMappingsFromFormState(FormStateInterface $form_state): array {
+    $raw = $form_state->getValue('mappings') ?? $form_state->get('mappings') ?? [];
+    $mappings = [];
+    foreach ($raw as $key => $row) {
+      if (!is_numeric($key) || !is_array($row)) {
+        continue;
+      }
+      $mappings[] = [
+        'entity_type' => 'node',
+        'bundle' => trim((string) ($row['bundle'] ?? '')),
+        'image_field' => trim((string) ($row['image_field'] ?? '')),
+        'color_field' => trim((string) ($row['color_field'] ?? '')),
+        'gradient_field' => trim((string) ($row['gradient_field'] ?? '')),
+        'form_group' => trim((string) ($row['form_group'] ?? '')),
+      ];
+    }
+    return $mappings;
   }
 
 }

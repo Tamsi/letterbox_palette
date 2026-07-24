@@ -2,9 +2,10 @@ name: 'Letterbox Palette'
 type: module
 description: 'Extracts dominant colors from a portrait image and lets editors pick a letterbox background color (solid or edge gradient) with a live preview.'
 core_version_requirement: ^10 || ^11
-package: Fields
+package: Media
 configure: letterbox_palette.settings
 dependencies:
   - drupal:node
   - drupal:file
   - drupal:image
+  - drupal:field

@@ -8,7 +8,27 @@
 declare(strict_types=1);
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
 use Drupal\letterbox_palette\PaletteFormAlter;
+
+/**
+ * Implements hook_help().
+ */
+function letterbox_palette_help($route_name, RouteMatchInterface $route_match): ?string {
+  switch ($route_name) {
+    case 'help.page.letterbox_palette':
+      $text = '<p>' . t('Letterbox Palette extracts dominant colors from a portrait image and lets editors pick a letterbox background color (solid or edge gradient) with a live preview on the entity form.') . '</p>';
+      $text .= '<p>' . t('Configure field mappings at <a href=":url">Letterbox Palette settings</a>. Each mapped content type needs an image field, a plain text color field (<code>#rrggbb</code>), and optionally a boolean gradient field.', [
+        ':url' => Url::fromRoute('letterbox_palette.settings')->toString(),
+      ]) . '</p>';
+      return $text;
+
+    case 'letterbox_palette.settings':
+      return '<p>' . t('Map portrait image fields to background color fields. Editors then see a live letterbox preview when uploading a portrait image.') . '</p>';
+  }
+  return NULL;
+}
 
 /**
  * Implements hook_form_alter().
