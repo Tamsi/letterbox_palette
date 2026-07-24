@@ -6,17 +6,19 @@
   "homepage": "https://www.drupal.org/project/letterbox_palette",
   "support": {
     "issues": "https://www.drupal.org/project/issues/letterbox_palette",
-    "source": "https://git.drupalcode.org/project/letterbox_palette"
+    "source": "https://git.drupalcode.org/project/letterbox_palette",
+    "docs": "https://www.drupal.org/docs/extending-drupal"
   },
   "authors": [
     {
       "name": "Tamsi",
-      "homepage": "https://github.com/Tamsi",
+      "homepage": "https://www.drupal.org/u/tamsi",
       "role": "Maintainer"
     }
   ],
   "require": {
     "php": ">=8.1",
+    "ext-gd": "*",
     "drupal/core": "^10 || ^11"
   }
 }

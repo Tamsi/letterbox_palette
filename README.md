@@ -1,8 +1,11 @@
 # Letterbox Palette
 
-Drupal 10 / 11 module that extracts dominant colors from a **portrait** image and lets editors pick a letterbox background color (solid or edge gradient) with a live preview on the entity form.
+Drupal 10 / 11 module that extracts dominant colors from a **portrait** image and
+lets editors pick a letterbox background color (solid or edge gradient) with a
+live preview on the entity form.
 
-Ideal for hero / poster layouts where a vertical image sits on a wide desktop canvas and needs matching side colors.
+Ideal for hero / poster layouts where a vertical image sits on a wide desktop
+canvas and needs matching side colors.
 
 ## Features
 
@@ -23,20 +26,21 @@ Ideal for hero / poster layouts where a vertical image sits on a wide desktop ca
 
 ## Installation
 
-### From GitHub (until the Drupal.org release is live)
+### From Drupal.org
+
+```bash
+composer require drupal/letterbox_palette
+drush en letterbox_palette -y
+drush cr
+```
+
+### From GitHub (development)
 
 ```bash
 composer config repositories.letterbox_palette vcs https://github.com/Tamsi/letterbox_palette.git
 composer require drupal/letterbox_palette:dev-1.0.x
 drush en letterbox_palette -y
 drush cr
-```
-
-### From Drupal.org (after the project is published)
-
-```bash
-composer require drupal/letterbox_palette
-drush en letterbox_palette -y
 ```
 
 ## Configuration
@@ -51,7 +55,8 @@ drush en letterbox_palette -y
    - Optional gradient field + Field Group name
 4. Edit a node: upload a **portrait** image → pick a swatch → save.
 
-Front-end themes can read the stored hex / boolean fields and apply `background-color` or a CSS gradient around `object-fit: contain` heroes.
+Front-end themes can read the stored hex / boolean fields and apply
+`background-color` or a CSS gradient around `object-fit: contain` heroes.
 
 ## API / reuse
 
@@ -63,13 +68,19 @@ $palette = \Drupal::service('letterbox_palette.extractor')
 // ['colors' => ['#aabbcc', ...], 'edges' => ['left' => ..., 'center' => ..., 'right' => ...]]
 ```
 
+## Supporting this module
+
+Bug reports and feature requests: the Drupal.org issue queue once the project
+is published, or the GitHub repository until then.
+
 ## Origin
 
-Extracted and generalized from a production France Télévisions (& Vous) festival editorial workflow.
+Extracted and generalized from a production France Télévisions (& Vous) festival
+editorial workflow.
 
 ## Maintainers
 
-- [Tamsi](https://github.com/Tamsi)
+- [Tamsi](https://www.drupal.org/u/tamsi) / [GitHub](https://github.com/Tamsi)
 
 ## License
 

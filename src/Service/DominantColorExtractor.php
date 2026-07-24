@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\letterbox_palette\Service;
 
 use Drupal\Core\File\FileSystemInterface;
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\file\FileInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Extracts a ranked dominant-color palette from an image file (GD).
@@ -18,9 +18,17 @@ class DominantColorExtractor {
    */
   public const PALETTE_SIZE = 6;
 
+  /**
+   * Constructs the extractor.
+   *
+   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
+   *   The file system service.
+   * @param \Psr\Log\LoggerInterface $logger
+   *   The letterbox_palette logger channel.
+   */
   public function __construct(
     protected FileSystemInterface $fileSystem,
-    protected LoggerChannelFactoryInterface $loggerFactory,
+    protected LoggerInterface $logger,
   ) {}
 
   /**
@@ -155,7 +163,7 @@ class DominantColorExtractor {
     $realpath = $this->fileSystem->realpath($uri);
     $path = $realpath !== FALSE ? $realpath : $uri;
     if (!is_readable($path)) {
-      $this->loggerFactory->get('letterbox_palette')->warning('Unreadable image @uri', ['@uri' => $uri]);
+      $this->logger->warning('Unreadable image @uri', ['@uri' => $uri]);
       return NULL;
     }
     return $path;
