@@ -1,13 +1,13 @@
 {
-  "name": "drupal/letterbox_palette",
+  "name": "drupal/letterboxbg",
   "description": "Extracts dominant colors from a portrait image and lets editors pick a letterbox background color with a live preview.",
   "type": "drupal-module",
   "license": "GPL-2.0-or-later",
-  "homepage": "https://www.drupal.org/project/letterbox_palette",
+  "homepage": "https://www.drupal.org/project/letterboxbg",
   "support": {
-    "issues": "https://www.drupal.org/project/issues/letterbox_palette",
-    "source": "https://git.drupalcode.org/project/letterbox_palette",
-    "docs": "https://www.drupal.org/docs/extending-drupal"
+    "issues": "https://www.drupal.org/project/issues/letterboxbg",
+    "source": "https://git.drupalcode.org/project/letterboxbg",
+    "docs": "https://www.drupal.org/project/letterboxbg"
   },
   "authors": [
     {

@@ -7,6 +7,9 @@ live preview on the entity form.
 Ideal for hero / poster layouts where a vertical image sits on a wide desktop
 canvas and needs matching side colors.
 
+- **Drupal.org project:** [letterboxbg](https://www.drupal.org/project/letterboxbg)
+- **Module machine name:** `letterbox_palette` (use this with `drush en`)
+
 ## Features
 
 - Pure PHP **GD** extraction (no Composer color library required)
@@ -29,7 +32,7 @@ canvas and needs matching side colors.
 ### From Drupal.org
 
 ```bash
-composer require drupal/letterbox_palette
+composer require drupal/letterboxbg
 drush en letterbox_palette -y
 drush cr
 ```
@@ -37,8 +40,8 @@ drush cr
 ### From GitHub (development)
 
 ```bash
-composer config repositories.letterbox_palette vcs https://github.com/Tamsi/letterbox_palette.git
-composer require drupal/letterbox_palette:dev-1.0.x
+composer config repositories.letterboxbg vcs https://github.com/Tamsi/letterbox_palette.git
+composer require drupal/letterboxbg:dev-1.0.x
 drush en letterbox_palette -y
 drush cr
 ```
@@ -70,8 +73,9 @@ $palette = \Drupal::service('letterbox_palette.extractor')
 
 ## Supporting this module
 
-Bug reports and feature requests: the Drupal.org issue queue once the project
-is published, or the GitHub repository until then.
+- Issues: [Drupal.org issue queue](https://www.drupal.org/project/issues/letterboxbg)
+- Source: [git.drupalcode.org/project/letterboxbg](https://git.drupalcode.org/project/letterboxbg)
+- Mirror: [GitHub](https://github.com/Tamsi/letterbox_palette)
 
 ## Origin
 
